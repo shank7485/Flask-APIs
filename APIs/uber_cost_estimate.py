@@ -1,5 +1,5 @@
 from uber_estimate import uber_estimate
-from geo_code import geo_location
+from uber_geo_code import geo_location
 
 class comparer_address:
     def __init__(self, from_address, to_address, geo_api_key, uber_api_key):
