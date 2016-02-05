@@ -4,8 +4,8 @@ from wtforms import Form, TextAreaField, TextField, SubmitField
 from gaussian_solver import matrix_class
 from APIs import app
 
-geo_api_key = "AIzaSyBp3NVaY0VMCDTx0L4ydgtjUOo6nTqOsy4"
-uber_api_key = "GPUdmRVEn6wh81YKtelcX-nX18pLmJcmKpDIiiie"
+geo_api_key = "" #ENTER Google GEO-LOCATE API KEY
+uber_api_key = "" #ENTER UBER API KEY
 
 """
 Address URL call:
