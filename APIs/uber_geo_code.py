@@ -1,7 +1,9 @@
 import requests
 
+
 class geo_location:
     "API_key is Google Maps API key"
+
     def __init__(self, API_key):
         self.API_key = API_key
 
@@ -16,5 +18,4 @@ class geo_location:
         lat = coodinates["lat"]
         long = coodinates["lng"]
 
-        return (lat,long)
-
+        return (lat, long)

@@ -17,13 +17,27 @@ Coordinates URL call:
 http://localhost:5000/estimate/coord/?f_lat=32.987922&f_long=-96.786982&t_lat=33.019843&t_long=-96.698886
 """
 
+
 @app.route('/')
 def home():
-    return render_template('index.html')
+    html = """
+    <p> 1) Uber Estimate - IPAddress/estimate/ </p>
+    <p> 2) </p>'
+    """
+    return html
+
 
 @app.route('/estimate/')
 def estimate_home():
-    return render_template('estimate.html')
+    html = """
+    <h2>Welcome to the Uber cost Estimate web service app.</h2>
+    <p>URL call format:</p>
+    <p>Addresses: /estimate/address/?f_addr="From address"&t_addr="To address"</p>
+    <p>Coordinates: /estimate/coord/?f_lat="From lat"&f_long="From long"&t_lat="To lat"&t_long="To long"</p>
+    <p>Created by <b>Shashank Kumar Shankar</b>. For questions, Email me at: <b>shank7485@gmail.com</b></p>
+    """
+    return html
+
 
 @app.route('/estimate/address/')
 def estimate_address():
@@ -32,6 +46,7 @@ def estimate_address():
 
     comp = comparer_address(from_address, to_address, geo_api_key, uber_api_key)
     return jsonify(comp.services_prices())
+
 
 @app.route('/estimate/coord/')
 def estimate_coord():
@@ -49,12 +64,13 @@ ALLOWED_EXTENSIONS = set(['txt'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 matrix_order = 0
 
+
 def allowed_file(filename):
     return '.' in filename and \
-            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-@app.route('/gaussian-solver/', methods = ['GET', 'POST'])
+@app.route('/gaussian-solver/', methods=['GET', 'POST'])
 def gaussian_solver():
     if request.method == 'GET':
 
@@ -71,20 +87,29 @@ def gaussian_solver():
         </form>
 
         <p>%s</p>
-        """ % "<br>".join(os.listdir(app.config['UPLOAD_FOLDER'],))
+        """ % "<br>".join(os.listdir(app.config['UPLOAD_FOLDER'], ))
 
         return html
+
     elif request.method == 'POST':
         file = request.files['file']
         matrix_order = int(request.form['text'])
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             main_file = filename.split('.')
-            main_file[0] = 'info'
-            main_file = main_file[0] + "." + main_file[1]
+            main_file = "info" + "." + main_file[1]
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], main_file))
             obj = matrix_class()
-            output = obj.gaussian_solver(matrix_order, obj.matrix_checker(matrix_order, '\\Users\\Shashank\\PycharmProjects\\APIs_on_Heroku\\APIs\\files\\info.txt'))
-            return """
-            <p> %s <p>
-            """ % "".join(output)
+            flag = obj.matrix_checker(matrix_order,
+                                      '\\Users\\Shashank\\PycharmProjects\\APIs_on_Heroku\\APIs\\files\\info.txt')
+            if flag != False:
+                output = obj.gaussian_solver(flag)
+                unknowns = str(output[0])
+                results = str(output[1])
+                return "<h1> Solution of the Matrix: <h1> \
+                        <p> Unknowns on LHS Matrix: <p> \
+                        <p> {} </p> \
+                        <p> Results: <p> \
+                        <p> {} </p> ".format(unknowns, results)
+            else:
+                return """Please check input matrix and try again"""

@@ -1,5 +1,4 @@
 class matrix_class:
-
     def matrix_checker(self, x, file_path):
         unknowns = []
         result = []
@@ -9,45 +8,40 @@ class matrix_class:
         with open(file_path) as file:
             for line in file:
                 line = line.split()
-                if len(line) == x + 1: #Checks for 'answer' values in equation. (Checks columns)
+                if len(line) == x + 1:  # Checks for 'answer' values in equation. (Checks columns)
                     line = [float(i) for i in line]
                     unknowns.append(line)
                 else:
                     flag = False
 
-            if len(unknowns) != x: #Checks for no. of rows
+            if len(unknowns) != x:  # Checks for no. of rows
                 flag = False
 
         for a in unknowns:
             result.append(a[x])
-            #del a[-1]
+
+        for a in unknowns:
+            if a[0] == 0 and a[1] == 0 and a[2] == 0:
+                flag = False
 
         if flag == False:
             return False
         else:
             dct.update(unknowns=unknowns)
-            dct.update(results=result)
+            dct.update(order=x)
             return dct
 
-
-    def gaussian_solver(self, x, dct):
+    def gaussian_solver(self, dct):
         unknowns = dct['unknowns']
-        results = dct['results']
+        x = dct['order']
 
-        """
-        print "Original unknowns: "
-        print unknowns
-
-        print "Original results"
-        print results
-        """
         l = 0
         k = 1
         value = 0
 
         while l < x - 1:
             while k < x:
-                for i in range(l, x+1, 1):
+                for i in range(l, x + 1, 1):
                     if i == l:
                         sign = 1.0
                         if unknowns[l][i] * unknowns[k][i] > 0:
@@ -64,20 +58,12 @@ class matrix_class:
             results.append(a[-1])
             del a[-1]
 
-        for i in range(x-1, -1, -1):
-            for j in range(x-1, i - 1, -1):
+        for i in range(x - 1, -1, -1):
+            for j in range(x - 1, i - 1, -1):
                 if i == j:
                     results[i] = results[i] / unknowns[i][j]
                     break
                 else:
                     results[i] = results[i] - (unknowns[i][j] * results[j])
 
-        return "Unknowns: " + str(unknowns) + " Results: " + str(results)
-
-        """
-        print "Changed unknowns"
-        print unknowns
-
-        print "Changed results"
-        print results
-        """
+        return (unknowns, results)

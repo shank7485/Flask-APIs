@@ -1,6 +1,7 @@
 from uber_estimate import uber_estimate
 from uber_geo_code import geo_location
 
+
 class comparer_address:
     def __init__(self, from_address, to_address, geo_api_key, uber_api_key):
         self.from_address = from_address
@@ -9,7 +10,6 @@ class comparer_address:
         self.uber_api_key = uber_api_key
 
     def services_prices(self):
-
         geo = geo_location(self.geo_api_key)
 
         (from_lat, from_long) = geo.geo_locate(self.from_address)
@@ -21,9 +21,10 @@ class comparer_address:
 
         dct = {}
         for name in prices:
-            dct.update({name["display_name"] : name["estimate"]})
+            dct.update({name["display_name"]: name["estimate"]})
 
         return dct
+
 
 class comparer_coord:
     def __init__(self, from_lat, from_long, to_lat, to_long, uber_api_key):
@@ -34,13 +35,12 @@ class comparer_coord:
         self.uber_api_key = uber_api_key
 
     def services_prices(self):
-
         uber = uber_estimate(self.uber_api_key, self.from_lat, self.from_long, self.to_lat, self.to_long)
 
         prices = uber.estimate()["prices"]
 
         dct = {}
         for name in prices:
-            dct.update({name["display_name"] : name["estimate"]})
+            dct.update({name["display_name"]: name["estimate"]})
 
         return dct
