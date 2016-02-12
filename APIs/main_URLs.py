@@ -21,8 +21,10 @@ http://localhost:5000/estimate/coord/?f_lat=32.987922&f_long=-96.786982&t_lat=33
 @app.route('/')
 def home():
     html = """
-    <p> 1) Uber Estimate - IPAddress/estimate/ </p>
-    <p> 2) </p>'
+    <h1>Welcome. The following are the APIs I have created. Go to each of them to know more. </h1>
+    <p> 1) Uber address based cost estimate- <a href="https://shashankkumar.herokuapp.com/estimate/" target="_blank"> https://shashankkumar.herokuapp.com/estimate/</a></p>
+    <p> 2) Gaussian NxN Matrix Solver - <a href="https://shashankkumar.herokuapp.com/gaussian-solver/" target="_blank"> https://shashankkumar.herokuapp.com/gaussian-solver/</a></p>
+    <p> 3) More to come...
     """
     return html
 
@@ -30,7 +32,10 @@ def home():
 @app.route('/estimate/')
 def estimate_home():
     html = """
-    <h2>Welcome to the Uber cost Estimate web service app.</h2>
+    <h2>Welcome to the Uber cost Estimate web service.</h2>
+    <p>In this web service, you can estimate the cost of going from one address to another using Uber</p>
+    <p>Works with coordinates also.</p>
+    <p></p>
     <p>URL call format:</p>
     <p>Addresses: /estimate/address/?f_addr="From address"&t_addr="To address"</p>
     <p>Coordinates: /estimate/coord/?f_lat="From lat"&f_long="From long"&t_lat="To lat"&t_long="To long"</p>
@@ -58,7 +63,6 @@ def estimate_coord():
     comp = comparer_coord(from_latitude, from_longitude, to_latitude, to_longitude, uber_api_key)
     return jsonify(comp.services_prices())
 
-#os.makedirs('/app/text')
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['txt'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -76,8 +80,12 @@ def gaussian_solver():
 
         html = """
         <!doctype html>
-        <title>Upload new File</title>
-
+        <title>Gaussian solver</title>
+        <h2>Gaussian NxN matrix equation Solver</h2>
+        <p>This web service solves a mathematical NxN equation. Upload formatted text files by writing matrix elements in rows and columns.</p>
+        <p>Created by <b>Shashank Kumar Shankar</b> with the help of <b><a href="https://www.linkedin.com/in/subramanian-nagarajan-28117223" target="_blank">Subramanian Nagarajan</a></b> from UTD.</p>
+        <p>For questions, Email me at: <b>shank7485@gmail.com</b></p>
+        
         <form action="" method=post enctype=multipart/form-data>
             <h1>Enter Matrix Order</h1>
             <p><input type=text name=text>
@@ -106,10 +114,14 @@ def gaussian_solver():
                 output = obj.gaussian_solver(flag)
                 unknowns = str(output[0])
                 results = str(output[1])
-                return "<h1> Solution of the Matrix: <h1> \
+                return "<h1> Solution of the Matrix: </h1> \
                         <p> Unknowns on LHS Matrix: <p> \
                         <p> {} </p> \
                         <p> Results: <p> \
                         <p> {} </p> ".format(unknowns, results)
             else:
-                return """Please check input matrix and try again"""
+                return """
+                <p> Please check input matrix file, there is an error. </p>
+                <p> Check order, or see if all values are not zeros </p>.
+                <a href="https://shashankkumar.herokuapp.com/gaussian-solver/"><b>BACK</b></a>
+                """
