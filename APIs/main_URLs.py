@@ -58,8 +58,8 @@ def estimate_coord():
     comp = comparer_coord(from_latitude, from_longitude, to_latitude, to_longitude, uber_api_key)
     return jsonify(comp.services_prices())
 
-
-UPLOAD_FOLDER = '\\Users\\Shashank\\PycharmProjects\\APIs_on_Heroku\\APIs\\files'
+#os.makedirs('/app/text')
+UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['txt'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 matrix_order = 0
@@ -101,7 +101,7 @@ def gaussian_solver():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], main_file))
             obj = matrix_class()
             flag = obj.matrix_checker(matrix_order,
-                                      '\\Users\\Shashank\\PycharmProjects\\APIs_on_Heroku\\APIs\\files\\info.txt')
+                                      '/tmp/info.txt')
             if flag != False:
                 output = obj.gaussian_solver(flag)
                 unknowns = str(output[0])
