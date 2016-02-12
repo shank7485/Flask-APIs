@@ -1,11 +1,13 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template, redirect, url_for
+from werkzeug.utils import secure_filename
 from uber_cost_estimate import comparer_address, comparer_coord
-from wtforms import Form, TextAreaField, TextField, SubmitField
 from gaussian_solver import matrix_class
+
+import os
 from APIs import app
 
-geo_api_key = "" #ENTER Google GEO-LOCATE API KEY
-uber_api_key = "" #ENTER UBER API KEY
+geo_api_key = "AIzaSyBp3NVaY0VMCDTx0L4ydgtjUOo6nTqOsy4"
+uber_api_key = "GPUdmRVEn6wh81YKtelcX-nX18pLmJcmKpDIiiie"
 
 """
 Address URL call:
@@ -17,18 +19,11 @@ http://localhost:5000/estimate/coord/?f_lat=32.987922&f_long=-96.786982&t_lat=33
 
 @app.route('/')
 def home():
-    index = '<p> 1) Uber Estimate - IPAddress/estimate/ </p>' \
-            '<p> 2) </p>'
-    return index
+    return render_template('index.html')
 
 @app.route('/estimate/')
 def estimate_home():
-    index = '<h2>Welcome to the Uber cost Estimate web service app.</h2>' \
-            '<p>URL call format:</p>' \
-            '<p>Addresses: /estimate/address/?f_addr="From address"&t_addr="To address"</p>' \
-            '<p>Coordinates: /estimate/coord/?f_lat="From lat"&f_long="From long"&t_lat="To lat"&t_long="To long"</p>' \
-            '<p>Created by <b>Shashank Kumar Shankar</b>. For questions, Email me at: <b>shank7485@gmail.com</b></p>'
-    return index
+    return render_template('estimate.html')
 
 @app.route('/estimate/address/')
 def estimate_address():
@@ -49,60 +44,47 @@ def estimate_coord():
     return jsonify(comp.services_prices())
 
 
-class matrix_form(Form):
-    matrix_order = TextField("Matrix Order")
-    text_area = TextAreaField("Enter")
-    submit = SubmitField("Send")
-"""
-@app.route('/gaussian-solver/')
-def gaussian_solver_form():
+UPLOAD_FOLDER = '\\Users\\Shashank\\PycharmProjects\\APIs_on_Heroku\\APIs\\files'
+ALLOWED_EXTENSIONS = set(['txt'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+matrix_order = 0
 
-    html =
-            <h1> Please paste matrix. </h1>
-            <form action="." method="POST">
-                <input type="text" name="text">
-                <input type="submit" name="my-form" value="Send">
-            </form>
-
-    return html
-"""
-@app.route('/gaussian-solver/', methods=['GET', 'POST'])
-def gaussian_solver_form_post():
-    form = matrix_form(request.form)
-    if request.method == 'POST':
-        order = form.matrix_order
-        text = form.text_area
-
-        text_file = open("gaussian_file.txt", "w")
-        text_file.write(text)
-        text_file.close()
-
-        matrix = matrix_class()
-        if matrix.matrix_checker(order, 'gaussian_file.txt') == False:
-            return "Enter proper values"
-        else:
-            return matrix.gaussian_solver(matrix.matrix_checker(order, 'gaussian_file.txt'), order)
-
-    elif request.method == 'GET':
-        return  """
-                <form action="{{ url_for('gaussian-solver') }}" method=post>
-
-				{{ form.matrix_order.label }}
-				{{ form.matrix_order }}
-
-				{{ form.text_area.label }}
-				{{ form.text_area }}
+def allowed_file(filename):
+    return '.' in filename and \
+            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-				<span style="display:block; height: 30px;"></span>
+@app.route('/gaussian-solver/', methods = ['GET', 'POST'])
+def gaussian_solver():
+    if request.method == 'GET':
 
-				{{ form.submit }}
+        html = """
+        <!doctype html>
+        <title>Upload new File</title>
 
-				</form>
-                """
+        <form action="" method=post enctype=multipart/form-data>
+            <h1>Enter Matrix Order</h1>
+            <p><input type=text name=text>
+            <h1>Upload new File</h1>
+            <p><input type=file name=file>
+                <input type=submit value=Upload>
+        </form>
 
+        <p>%s</p>
+        """ % "<br>".join(os.listdir(app.config['UPLOAD_FOLDER'],))
 
-
-
-
-
+        return html
+    elif request.method == 'POST':
+        file = request.files['file']
+        matrix_order = int(request.form['text'])
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            main_file = filename.split('.')
+            main_file[0] = 'info'
+            main_file = main_file[0] + "." + main_file[1]
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], main_file))
+            obj = matrix_class()
+            output = obj.gaussian_solver(matrix_order, obj.matrix_checker(matrix_order, '\\Users\\Shashank\\PycharmProjects\\APIs_on_Heroku\\APIs\\files\\info.txt'))
+            return """
+            <p> %s <p>
+            """ % "".join(output)

@@ -30,16 +30,17 @@ class matrix_class:
             return dct
 
 
-    def gaussian_solver(self, dct, x):
+    def gaussian_solver(self, x, dct):
         unknowns = dct['unknowns']
         results = dct['results']
 
+        """
         print "Original unknowns: "
         print unknowns
 
         print "Original results"
         print results
-
+        """
         l = 0
         k = 1
         value = 0
@@ -71,9 +72,12 @@ class matrix_class:
                 else:
                     results[i] = results[i] - (unknowns[i][j] * results[j])
 
+        return "Unknowns: " + str(unknowns) + " Results: " + str(results)
 
+        """
         print "Changed unknowns"
         print unknowns
 
         print "Changed results"
         print results
+        """
